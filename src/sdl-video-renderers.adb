@@ -20,6 +20,7 @@
 --     3. This notice may not be removed or altered from any source
 --     distribution.
 --------------------------------------------------------------------------------------------------------------------
+with Ada.Unchecked_Conversion;
 with Interfaces.C;
 with SDL.Error;
 
@@ -483,6 +484,37 @@ package body SDL.Video.Renderers is
    begin
       SDL_Render_Present (Self.Internal);
    end Present;
+
+   procedure Read_Pixels (Self      : in Renderer;
+                          Rectangle : access SDL.Video.Rectangles.Rectangle;
+                          Format    : in SDL.Video.Pixel_Formats.Pixel_Format_Names;
+                          Pixels    : in C.Strings.chars_ptr;
+                          Pitch     : in Interfaces.C.int) is
+
+      --  Convert the Pixel_Format_Name to an Unsigned_32 because the compiler is changing the value somewhere along
+      --  the lines from the start of this procedure to calling SDL_Create_Texture.
+      function To_Unsigned32 is new Ada.Unchecked_Conversion (Source => SDL.Video.Pixel_Formats.Pixel_Format_Names,
+                                                              Target => Interfaces.Unsigned_32);
+
+      function SDL_Render_Read_Pixels (R      : in SDL.C_Pointers.Renderer_Pointer;
+                                       Rect   : access SDL.Video.Rectangles.Rectangle;
+                                       Format : in Interfaces.Unsigned_32;
+                                       Pixels : in C.Strings.chars_ptr;
+                                       Pitch  : in C.int) return C.int with
+        Import        => True,
+        Convention    => C,
+        External_Name => "SDL_RenderReadPixels";
+      Result : C.int := SDL_Render_Read_Pixels (Self.Internal,
+                                                Rectangle,
+                                                To_Unsigned32 (Format),
+                                                Pixels,
+                                                Pitch);
+   begin
+      if Result /= Success then
+         raise Renderer_Error with SDL.Error.Get;
+      end if;
+   end Read_Pixels;
+
 
    function Supports_Targets (Self : in Renderer) return Boolean is
       function SDL_Render_Target_Supported (R : in SDL.C_Pointers.Renderer_Pointer) return SDL_Bool with

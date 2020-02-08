@@ -25,8 +25,10 @@
 --  Renderer.
 --------------------------------------------------------------------------------------------------------------------
 with Ada.Finalization;
+with Interfaces.C.Strings;
 private with SDL.C_Pointers;
 with SDL.Video.Palettes;
+with SDL.Video.Pixel_Formats;
 with SDL.Video.Rectangles;
 with SDL.Video.Surfaces;
 with SDL.Video.Textures;
@@ -120,7 +122,11 @@ package SDL.Video.Renderers is
 
    procedure Present (Self : in Renderer);
 
-   --  SDL_RenderReadPixels
+   procedure Read_Pixels (Self      : in Renderer;
+                          Rectangle : access SDL.Video.Rectangles.Rectangle;
+                          Format    : in SDL.Video.Pixel_Formats.Pixel_Format_Names;
+                          Pixels    : in Interfaces.C.Strings.chars_ptr;
+                          Pitch     : in Interfaces.C.int);
 
    function Supports_Targets (Self : in Renderer) return Boolean;
 

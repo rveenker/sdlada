@@ -6,13 +6,19 @@ library project SDLAda is
    Mode     : Mode_Type     := external ("SDL_MODE", "debug");
 
    for Languages    use ("Ada", "C");
-   for Source_Dirs  use ("../../src", "../../src/" & Platform, "gen/src/",
+   for Source_Dirs  use ("../../src"
+                         , "../../src/" & Platform
+                         , "gen/src/"
+
+                         --  For SDL.Audio
+                         , "../../src/audio"
 
                          --  For SDL.Image.
-                         "../../src/image",
+                         , "../../src/image"
 
                          --  For SDL.TTF.
-                         "../../src/ttf");
+                         , "../../src/ttf");
+
    for Library_Name use "sdlada";
    for Object_Dir   use "gen/" & Mode & "/lib/.obj";
    for Library_Dir  use "gen/" & Mode &  "/lib";

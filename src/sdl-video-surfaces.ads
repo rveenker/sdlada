@@ -64,6 +64,10 @@ package SDL.Video.Surfaces is
    function Size (Self : in Surface) return SDL.Sizes with
      Inline => True;
 
+      --  Get the pitch of this surface.
+   function Pitch (Self : in Surface) return C.int with
+     Inline => True;
+
    --  TODO: Make generic so that we can get access to specific arrays which are mapped onto the Pixels address.
    function Pixels (Self : in Surface) return System.Address with
      Inline => True;
