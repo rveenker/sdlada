@@ -28,6 +28,7 @@ with Ada.Finalization;
 with Interfaces.C;
 with System;
 private with SDL.C_Pointers;
+with SDL.RWops;
 with SDL.Video;
 with SDL.Video.Palettes;
 with SDL.Video.Pixel_Formats;
@@ -151,6 +152,17 @@ package SDL.Video.Surfaces is
    --  TODO: SDL_LoadBMP_RW
    --  TODO: SDL_SaveBMP
    --  TODO: SDL_SaveBMP_RW
+
+   procedure Save_BMP (Self : in out Surface;
+                       To   : in SDL.RWops.RWops;
+                       Free : in Boolean);
+
+   procedure Save_BMP (Self : in out Surface;
+                        File : in String);
+
+   procedure Save_PNG (Self : in out Surface;
+                       To   : in SDL.RWops.RWops;
+                       Free : in Boolean);
 
    procedure Lock (Self : in out Surface) with
      Inline => True;

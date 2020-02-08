@@ -35,6 +35,27 @@ package body SDL.Events.Events is
       return SDL_Poll_Event (Event) = 1;
    end Poll;
 
+   procedure SDL_PumpEvents;
+   pragma Import (CPP, SDL_PumpEvents, "SDL_PumpEvents");
+
+   procedure Pump is
+      procedure SDL_PumpEvents;
+      pragma Import (CPP, SDL_PumpEvents, "SDL_PumpEvents");
+   begin
+      SDL_PumpEvents;
+   end Pump;
+
+   function Push (Event : in Events) return Boolean is
+      use type Interfaces.C.int;
+
+      function SDL_Push_Event (Event : in Events) return Interfaces.C.int with
+        Import        => True,
+        Convention    => C,
+        External_Name => "SDL_PushEvent";
+   begin
+      return SDL_Push_Event (Event) = 1;
+   end Push;
+
    procedure Wait (Event : out Events) is
       function SDL_Wait_Event (Event : out Events) return Interfaces.C.int with
         Import        => True,

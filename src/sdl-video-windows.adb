@@ -208,6 +208,12 @@ package body SDL.Video.Windows is
       end return;
    end From_ID;
 
+   function From_Hwnd (Hwnd : Long_Integer) return Native_Window is
+      function To_Address is new Ada.Unchecked_Conversion (Source => Long_Integer, Target => System.Address);
+   begin
+      return Native_Window (To_Address (Hwnd));
+   end From_Hwnd;
+
    procedure Get_Gamma_Ramp (Self : in Window; Red, Green, Blue : out SDL.Video.Pixel_Formats.Gamma_Ramp) is
       function SDL_Get_Window_Gamma_Ramp (W       : in SDL.C_Pointers.Windows_Pointer;
                                           R, G, B : out SDL.Video.Pixel_Formats.Gamma_Ramp) return C.int with

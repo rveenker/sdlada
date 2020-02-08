@@ -24,10 +24,22 @@
 --
 --  Functions to create surface objects.
 --------------------------------------------------------------------------------------------------------------------
+with Interfaces.C.Strings;
+
 package SDL.Video.Surfaces.Makers is
    procedure Create (Self       : in out Surface;
                      Size       : in SDL.Sizes;
                      BPP        : in Pixel_Depths;
+                     Red_Mask   : in Colour_Masks;
+                     Blue_Mask  : in Colour_Masks;
+                     Green_Mask : in Colour_Masks;
+                     Alpha_Mask : in Colour_Masks);
+
+   procedure Create (Self       : in out Surface;
+                     Pixels     : in C.Strings.chars_ptr;
+                     Size       : in SDL.Sizes;
+                     BPP        : in Pixel_Depths;
+                     Pitch      : in Integer;
                      Red_Mask   : in Colour_Masks;
                      Blue_Mask  : in Colour_Masks;
                      Green_Mask : in Colour_Masks;

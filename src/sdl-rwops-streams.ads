@@ -32,7 +32,7 @@ package SDL.RWops.Streams is
    function Open (Op : in RWops) return RWops_Stream;
    procedure Open (Op : in RWops; Stream : out RWops_Stream);
 
-   procedure Close (Stream : in RWops_Stream);
+   procedure Close (Stream : in out RWops_Stream);
 
    overriding
    procedure Read (Stream : in out RWops_Stream;

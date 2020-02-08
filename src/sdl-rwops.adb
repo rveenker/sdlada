@@ -173,6 +173,33 @@ package body SDL.RWops is
       Ops := From_File (File_Name, Mode);
    end From_File;
 
+   function From_Mem (Mem  : in System.Address;
+                      Size : in Sizes) return RWops
+   is
+      function SDL_RW_From_Mem (Mem  : in System.Address;
+                                Size : in Sizes) return RWops_Pointer with
+        Import        => True,
+        Convention    => C,
+        External_Name => "SDL_RWFromMem";
+      RWop : RWops_Pointer;
+   begin
+
+      RWop := SDL_RW_From_Mem (Mem => Mem, Size => Size);
+
+      if RWop = null then
+         raise RWops_Error with SDL.Error.Get;
+      end if;
+
+      return RWops (RWop);
+   end From_Mem;
+
+   procedure From_Mem (Mem  : in System.Address;
+                       Size : in Sizes;
+                       Ops  : out RWops) is
+   begin
+      Ops := From_Mem (Mem, Size);
+   end From_Mem;
+
    function Seek (Context : in RWops;
                   Offset  : in Offsets;
                   Whence  : in Whence_Type) return Offsets

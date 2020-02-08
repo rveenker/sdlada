@@ -109,7 +109,17 @@ package SDL.Video.Textures is
    function Get_Size (Self : in Texture) return SDL.Sizes;
 
    --  SDL_UpdateTexture
-   --  SDL_UpdateYUVTexture
+
+   generic
+      type Pixel_Pointer_Type is private;
+   procedure Update_YUV_Texture (Self      : in out Texture;
+                                 Y_Plane   : in Pixel_Pointer_Type;
+                                 Y_Pitch   : in Natural;
+                                 U_Plane   : in Pixel_Pointer_Type;
+                                 U_Pitch   : in Natural;
+                                 V_Plane   : in Pixel_Pointer_Type;
+                                 V_Pitch   : in Natural);
+
 private
    type Texture is new Ada.Finalization.Limited_Controlled with
       record

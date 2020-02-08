@@ -35,17 +35,19 @@ package body SDL.RWops.Streams is
       Stream.Context := Op;
    end Open;
 
-   procedure Close (Stream : in RWops_Stream) is
-   begin
-      Close (Stream.Context);
-   end Close;
-
    overriding
    procedure Read (Stream : in out RWops_Stream;
                    Item   : out Ada.Streams.Stream_Element_Array;
                    Last   : out Ada.Streams.Stream_Element_Offset)
    is
       Objects_Read : Interfaces.C.unsigned_long := 0;
+
+      function SDL_Read (Context : in RWops_Pointer;
+                         Ptr     : in System.Address;
+                         Size    : in C.unsigned_long;
+                         Max_Num : in C.unsigned_long
+                        ) return C.unsigned_long;
+      pragma Import (C, SDL_Read, "read_wrap");
    begin
       --  Re-implemented c-macro:
       --  #define SDL_RWread(ctx, ptr, size, n)   (ctx)->read(ctx, ptr, size, n)
@@ -56,23 +58,29 @@ package body SDL.RWops.Streams is
       --     size    : Interfaces.C.unsigned_long;
       --     maxnum  : Interfaces.C.unsigned_long) return Interfaces.C.unsigned_long;
 
-      Objects_Read := Stream.Context.Read
-        (Context  => RWops_Pointer (Stream.Context),
-         Ptr      => Item'Address,
-         Size     => Item'Length,
-         Max_Num  => 1);
+      Objects_Read := SDL_Read (Context => RWops_Pointer (Stream.Context),
+                                Ptr     => Item'Address,
+                                Size    => C.unsigned_long (Item'Length),
+                                Max_Num => 1);
 
       if Objects_Read = 0 then
          raise RWops_Error with SDL.Error.Get;
       end if;
 
-      Last := Item'Length;
+      Last := Ada.Streams.Stream_Element_Offset (Objects_Read);
    end Read;
 
    overriding
    procedure Write (Stream : in out RWops_Stream; Item : Ada.Streams.Stream_Element_Array)
    is
       Objects_Written : Interfaces.C.unsigned_long := 0;
+
+      function SDL_Write (Context : in RWops_Pointer;
+                          Ptr     : in System.Address;
+                          Size    : in C.unsigned_long;
+                          Num     : in C.unsigned_long
+                         ) return C.unsigned_long;
+      pragma Import (C, SDL_Write, "write_wrap");
    begin
       --  Re-implemented c-macro:
       --  #define SDL_RWwrite(ctx, ptr, size, n)  (ctx)->write(ctx, ptr, size, n)
@@ -83,14 +91,37 @@ package body SDL.RWops.Streams is
       --     Size    : Interfaces.C.unsigned_long;
       --     Num     : Interfaces.C.unsigned_long) return Interfaces.C.unsigned_long;
 
-      Objects_Written := Stream.Context.Write
+      Objects_Written := SDL_Write
         (Context => RWops_Pointer (Stream.Context),
          Ptr     => Item'Address,
-         Size    => Item'Length,
+         Size    => C.unsigned_long (Item'Length),
          Num     => 1);
 
       if Objects_Written = 0 then
          raise RWops_Error with SDL.Error.Get;
       end if;
    end Write;
+
+   procedure Close (Stream : in out RWops_Stream)
+   is
+      use type C.int;
+      Res : C.int := 0;
+
+      function SDL_Close (Context : in RWops_Pointer) return C.int;
+      pragma Import (C, SDL_Close, "close_wrap");
+   begin
+      --  Re-implemented c-macro:
+      --  #define SDL_RWclose(ctx)                (ctx)->close(ctx)
+
+      --  Close  : access function
+      --    (Context : RWops_Pointer) return Interfaces.C.int;
+
+      Res := SDL_Close (Context => RWops_Pointer (Stream.Context));
+
+      if Res /= 0 then
+         raise RWops_Error with SDL.Error.Get;
+      end if;
+   end Close;
+
+
 end SDL.RWops.Streams;

@@ -133,6 +133,16 @@ package SDL.Events.Events is
    function Poll (Event : out Events) return Boolean with
      Inline => True;
 
+   --  Pump pending events.
+   --
+   --  This function updates the event queue and internal input device state.
+   procedure Pump with
+     Inline => True;
+
+   --  Push an event.
+   --
+   function Push (Event : in Events) return Boolean;
+
    --  Wait until an event is pending.
    --
    --  If there are any pending events, the next event is removed from

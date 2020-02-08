@@ -26,7 +26,7 @@
 --------------------------------------------------------------------------------------------------------------------
 with Ada.Strings.UTF_Encoding;
 with Interfaces.C;
-private with System;
+with System;
 
 package SDL.RWops is
    package C renames Interfaces.C;
@@ -88,6 +88,13 @@ package SDL.RWops is
                         Mode      : in File_Mode;
                         Ops       : out RWops);
 
+   function From_Mem (Mem  : in System.Address;
+                      Size : in Sizes) return RWops;
+
+   procedure From_Mem (Mem  : in System.Address;
+                       Size : in Sizes;
+                       Ops  : out RWops);
+
    procedure Close (Ops : in RWops);
 
    function Read_U_8 (src : in RWops) return Uint8 with
@@ -148,10 +155,42 @@ private
    --  used to store data, this consists of two pointers. This is all that is allowed.
    --
    --  TODO: Make it generic passing in two access types of convention C.
+
+
+   --  Definition of SDL_RWops struct in Ada.
+   --  Note that it is platform dependant and may need altering.
+   type WindowsIO_Data is
+      record
+         Append      : SDL_Bool;
+         H           : System.Address;
+         Buffer_data : System.Address;
+         Buffer_Size : Offsets;
+         Buffer_Left : Offsets;
+      end record with
+     Convention => C;
+
+   type StdIO_Data is
+      record
+         Autoclose : SDL_Bool;
+         fp        : System.Address;
+      end record with
+     Convention => C;
+
    type User_Datums is
       record
          Data_1 : System.Address;
          Data_2 : System.Address;
+      end record with
+     Convention => C;
+
+   type Hidden_Data is
+      record
+         WindowsIO : WindowsIO_Data;
+         StdIO     : StdIO_Data;
+         Mem_Base  : System.Address;
+         Mem_Here  : System.Address;
+         Mem_Stop  : System.Address;
+         User_Data : User_Datums;
       end record with
      Convention => C;
 
@@ -167,6 +206,8 @@ private
          Seek        : access function (Context : in RWops_Pointer;
                                         Offset  : in Offsets;
                                         Whence  : in Whence_Type) return Offsets;
+         --  The functions Read and Write do not work (parameter passing of values fails)
+         --  Use the wrapped functions instead
          Read        : access function (Context : in RWops_Pointer;
                                         Ptr     : in System.Address;
                                         Size    : in Sizes;
@@ -177,7 +218,7 @@ private
                                         Num     : in C.unsigned_long) return C.unsigned_long;
          Close       : access function (Context : in RWops_Pointer) return C.int;
          Stream_Type : Stream_Types;  --  When creating a RWops, this should always be set to Unknown_Stream.
-         User_Data   : User_Datums;
+         Hidden      : Hidden_Data;
       end record with
      Convention => C_Pass_By_Copy;
 

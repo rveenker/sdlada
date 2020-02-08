@@ -22,6 +22,9 @@
 --------------------------------------------------------------------------------------------------------------------
 with Ada.Finalization;
 package body SDL.Video.Surfaces.Makers is
+
+   use type C.Strings.chars_ptr;
+
    procedure Create (Self       : in out Surface;
                      Size       : in SDL.Sizes;
                      BPP        : in Pixel_Depths;
@@ -51,7 +54,39 @@ package body SDL.Video.Surfaces.Makers is
                                                Alpha_Mask => Alpha_Mask);
    end Create;
 
-   --  TODO: SDL_CreateRGBSurfaceFrom
+   procedure Create (Self       : in out Surface;
+                     Pixels     : in C.Strings.chars_ptr;
+                     Size       : in SDL.Sizes;
+                     BPP        : in Pixel_Depths;
+                     Pitch      : in Integer;
+                     Red_Mask   : in Colour_Masks;
+                     Blue_Mask  : in Colour_Masks;
+                     Green_Mask : in Colour_Masks;
+                     Alpha_Mask : in Colour_Masks) is
+      function SDL_Create_RGB_Surface_From
+        (Pixels     : in C.Strings.chars_ptr := C.Strings.Null_Ptr;
+         Width      : in C.int               := 0;
+         Height     : in C.int               := 0;
+         Depth      : in Pixel_Depths        := 1;
+         Pitch      : in C.int               := 0;
+         Red_Mask   : in Colour_Masks        := 0;
+         Green_Mask : in Colour_Masks        := 0;
+         Blue_Mask  : in Colour_Masks        := 0;
+         Alpha_Mask : in Colour_Masks        := 0) return Internal_Surface_Pointer with
+        Import        => True,
+        Convention    => C,
+        External_Name => "SDL_CreateRGBSurfaceFrom";
+   begin
+      Self.Internal := SDL_Create_RGB_Surface_From (Pixels     => Pixels,
+                                                    Width      => Size.Width,
+                                                    Height     => Size.Height,
+                                                    Depth      => BPP,
+                                                    Pitch      => C.int (Pitch),
+                                                    Red_Mask   => Red_Mask,
+                                                    Green_Mask => Green_Mask,
+                                                    Blue_Mask  => Blue_Mask,
+                                                    Alpha_Mask => Alpha_Mask);
+   end Create;
 
    --     procedure Create (Self : in out Surface; File_Name : in String) is
    --        --  This is actually a macro in the header.

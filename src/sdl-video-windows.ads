@@ -110,6 +110,9 @@ package SDL.Video.Windows is
 
    function From_ID (Window_ID : in ID) return Window;
 
+   --  Support for MS Windows handles
+   function From_Hwnd (Hwnd : Long_Integer) return Native_Window;
+
    procedure Get_Gamma_Ramp (Self : in Window; Red, Green, Blue : out SDL.Video.Pixel_Formats.Gamma_Ramp);
    procedure Set_Gamma_Ramp (Self : in out Window; Red, Green, Blue : in SDL.Video.Pixel_Formats.Gamma_Ramp);
 

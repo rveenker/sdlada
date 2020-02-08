@@ -520,6 +520,15 @@ package body SDL.Video.Renderers is
       end return;
    end Get_Renderer;
 
+   procedure Get_Renderer (Self        : in out Renderer;
+                           From_Window : in SDL.Video.Windows.Window) is
+   begin
+      Self.Internal := Get_Renderer (From_Window).Internal;
+      if Self.Internal = null then
+         raise Constraint_Error;
+      end if;
+   end Get_Renderer;
+
    function Get_Internal_Renderer (Self : in Renderer) return SDL.C_Pointers.Renderer_Pointer is
    begin
       return Self.Internal;

@@ -299,6 +299,40 @@ package body SDL.Video.Textures is
       return Size;
    end Get_Size;
 
+   procedure Update_YUV_Texture (Self      : in out Texture;
+                                 Y_Plane   : in Pixel_Pointer_Type;
+                                 Y_Pitch   : in Natural;
+                                 U_Plane   : in Pixel_Pointer_Type;
+                                 U_Pitch   : in Natural;
+                                 V_Plane   : in Pixel_Pointer_Type;
+                                 V_Pitch   : in Natural) is
+
+      procedure SDL_UpdateYUVTexture (T      : in SDL.C_Pointers.Texture_Pointer;
+                                      Area   : in System.Address;
+                                      YPlane : in Pixel_Pointer_Type;
+                                      YPitch : in Natural;
+                                      UPlane : in Pixel_Pointer_Type;
+                                      UPitch : in Natural;
+                                      VPlane : in Pixel_Pointer_Type;
+                                      VPitch : in Natural) with
+        Import        => True,
+        Convention    => C,
+        External_Name => "SDL_UpdateYUVTexture";
+--     extern DECLSPEC int SDLCALL SDL_UpdateYUVTexture (SDL_Texture * texture,
+--                                                       const SDL_Rect * rect,
+--                                                       const Uint8 * Yplane, int Ypitch,
+--                                                       const Uint8 * Uplane, int Upitch,
+--                                                   const Uint8 *Vplane, int Vpitch);
+
+   begin
+      SDL_UpdateYUVTexture (T => Self.Internal, Area => System.Null_Address,
+                            YPlane => Y_Plane, YPitch => Y_Pitch,
+                            UPlane => U_Plane, UPitch => U_Pitch,
+                            VPlane => V_Plane, VPitch => V_Pitch);
+
+   end Update_YUV_Texture;
+
+
    overriding
    procedure Finalize (Self : in out Texture) is
    begin

@@ -420,6 +420,58 @@ package body SDL.Video.Surfaces is
       end if;
    end Set_Colour;
 
+   procedure Save_BMP (Self : in out Surface;
+                       File : in String) is
+      function SDL_Save_BMP (S   : in Internal_Surface_Pointer;
+                             dst : in SDL.RWops.RWops;
+                             f   : SDL_Bool) return C.int with
+        Import        => True,
+        Convention    => C,
+        External_Name => "SDL_SaveBMP_RW";
+
+      Result : C.int := SDL_Save_BMP (S   => Self.Internal,
+                                      dst => SDL.RWops.From_File (File, SDL.RWops.Create_To_Write_Binary),
+                                      f   => SDL_True);
+   begin
+      if Result < SDL.Success then
+         raise Surface_Error with SDL.Error.Get;
+      end if;
+   end Save_BMP;
+
+   procedure Save_BMP (Self : in out Surface;
+                       To   : in SDL.RWops.RWops;
+                       Free : in Boolean) is
+      function SDL_Save_BMP (S   : in Internal_Surface_Pointer;
+                             dst : in SDL.RWops.RWops;
+                             f   : SDL_Bool) return C.int with
+        Import        => True,
+        Convention    => C,
+        External_Name => "SDL_SaveBMP_RW";
+
+      Result : C.int := SDL_Save_BMP (S => Self.Internal, dst => To, f => (if Free then SDL_True else SDL_False));
+   begin
+      if Result < SDL.Success then
+         raise Surface_Error with SDL.Error.Get;
+      end if;
+   end Save_BMP;
+
+   procedure Save_PNG (Self : in out Surface;
+                       To   : in SDL.RWops.RWops;
+                       Free : in Boolean) is
+      function IMG_Save_PNG (S   : in Internal_Surface_Pointer;
+                             dst : in SDL.RWops.RWops;
+                             f   : SDL_Bool) return C.int with
+        Import        => True,
+        Convention    => C,
+        External_Name => "IMG_SavePNG_RW";
+
+      Result : C.int := IMG_Save_PNG (S => Self.Internal, dst => To, f => (if Free then SDL_True else SDL_False));
+   begin
+      if Result < SDL.Success then
+         raise Surface_Error with SDL.Error.Get;
+      end if;
+   end Save_PNG;
+
    procedure Lock (Self : in out Surface) is
       function SDL_Lock_Surface (Self : in Internal_Surface_Pointer) return C.int with
         Import        => True,
